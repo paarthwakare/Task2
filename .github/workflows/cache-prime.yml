@@ -1,0 +1,31 @@
+name: Cache Primer
+
+on:
+  workflow_dispatch:  # Allows you to manually trigger the action
+  push:
+    branches: [ main ]
+
+jobs:
+  cache-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Cache dependencies
+        id: cache-step
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/my-dependencies
+          key: cache-e4242db
+
+      - name: prime-cache-e4242db
+        run: |
+          if [ "${{ steps.cache-step.outputs.cache-hit }}" == "true" ]; then
+            echo "Cache hit: Using cached dependencies"
+          else
+            echo "Cache miss: No cached dependencies found"
+            mkdir -p ~/.cache/my-dependencies
+            echo "Sample dependency data" > ~/.cache/my-dependencies/sample.txt
+          fi
