@@ -1,31 +1,38 @@
-name: Cache Example Workflow
+name: Cache Example CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
-  build:
+  cache-job:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up cache
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: prime-cache-e4242db
         id: cache-step
         uses: actions/cache@v4
         with:
-          path: ~/.cache/mydeps
+          path: |
+            node_modules
           key: cache-e4242db
 
-      - name: prime-cache-e4242db
+      - name: Echo cache result
         run: |
           if [ "${{ steps.cache-step.outputs.cache-hit }}" == "true" ]; then
-            echo "Cache hit for key cache-e4242db"
+            echo "Cache hit"
           else
-            echo "Cache miss for key cache-e4242db"
-            mkdir -p ~/.cache/mydeps
-            echo "dummy file" > ~/.cache/mydeps/file.txt
+            echo "Cache miss"
           fi
+
+      - name: Install dependencies
+        run: npm install
