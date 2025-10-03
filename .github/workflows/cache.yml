@@ -1,0 +1,31 @@
+name: Cache Example Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up cache
+        id: cache-step
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/mydeps
+          key: cache-e4242db
+
+      - name: prime-cache-e4242db
+        run: |
+          if [ "${{ steps.cache-step.outputs.cache-hit }}" == "true" ]; then
+            echo "Cache hit for key cache-e4242db"
+          else
+            echo "Cache miss for key cache-e4242db"
+            mkdir -p ~/.cache/mydeps
+            echo "dummy file" > ~/.cache/mydeps/file.txt
+          fi
